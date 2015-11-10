@@ -12,5 +12,15 @@
      "js": ["content.js"]
    }
    ],
-  "permissions": ["tabs"]
+   
+  "permissions": ["tabs"],
+  
+  "chrome_url_overrides" : {
+    "newtab": "redirect.html"
+  },
+  
+  "icons": { "128": "icon.png"
+            }
+
 }
+
