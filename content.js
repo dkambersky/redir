@@ -1,5 +1,5 @@
-//MANUAL OVERRIDE:
-enabled = false;
+//MANUAL OVERRIDE -- set to 'false' to turn redirecting off
+enabled = true;
 
 var pattern = new RegExp("reddit");
 var pattern1 = new RegExp("youtube");

@@ -1,1 +1,1 @@
-window.location="http://xcabbage.github.io/v2/land";
+window.location="http://dkambersky.github.io/v2/land";
