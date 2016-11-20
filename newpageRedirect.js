@@ -1,1 +1,1 @@
-window.location="http://dkambersky.github.io/";
+window.location="http://dkambersky.github.io/i";

@@ -1,26 +1,37 @@
 {
-  "name": "Cabbage's Anti-Procrastinator",
-  "version": "1.3.37",
-  "description": "Checks URL and redirects as required. Fuck reddit!",
-  "background": { 
-     "page":"bg.html"
-     },
-   "manifest_version": 3,
-   "content_scripts": [
-   {
-     "matches": ["http://*/*", "https://*/*"],
-     "js": ["content.js"]
-   }
-   ],
-   
-  "permissions": ["tabs"],
-  
-  "chrome_url_overrides" : {
-    "newtab": "redirect.html"
-  },
-  
-  "icons": { "128": "icon.png"
-            }
+    "name": "Cabbage's Anti-Procrastinator",
+    "version": "1.3.37",
+    "description": "Redirects from time-sink sites to a custom page. Screw reddit! (+ newtab functionality)",
+    "background": {
+        "page": "bg.html",
+        "scripts": ["bg-requests.js"]
+    },
+    "manifest_version": 3,
+    "content_scripts": [{
+        "matches": ["http://*/*", "https://*/*"],
+        "js": ["content.js"]
+    }],
+
+    "permissions": ["webRequest", "tabs", "*://reddit.com/*", "*://*.reddit.com/*", "webRequestBlocking"],
+
+    "chrome_url_overrides": {
+        "newtab": "redirect.html"
+    },
+
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_title": "Control blocked sites"
+
+    },
+
+    "icons": {
+        "128": "icon.png"
+    },
+
+    "options_ui": {
+      "page": "options.html",
+      "chrome_style": true
+
+    }
 
 }
-

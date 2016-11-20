@@ -1,5 +1,5 @@
 //MANUAL OVERRIDE -- set to 'false' to turn redirecting off
-enabled = false;
+enabled = true;
 
 var pattern = new RegExp("reddit");
 var pattern1 = new RegExp("youtube");
@@ -11,7 +11,7 @@ var urlA = window.location;
 
 var redir = false;
 
-if (pattern.test(urlA)||pattern1.test(urlA)||pattern2.test(urlA)||pattern3.test(urlA) || pattern5.test(urlA)) // if it matches pattern defined above
+if (pattern.test(urlA)||pattern2.test(urlA)||pattern3.test(urlA) || pattern5.test(urlA)) // if it matches pattern defined above
 
 {redir = true; }
 
