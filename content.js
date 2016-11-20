@@ -23,7 +23,5 @@ redir = false ;}
 
 
 if(redir && enabled){
-
   chrome.extension.sendRequest({redirect: "chrome://newtab"}); // send message to redirect
-
 }

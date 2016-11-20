@@ -1,12 +1,12 @@
 {
     "name": "Cabbage's Anti-Procrastinator",
     "version": "1.3.37",
-    "description": "Redirects from time-sink sites to a custom page. Screw reddit! (+ newtab functionality)",
+    "description": "Redirects time-sink sites to a custom URL. Screw reddit!
+        (+newtab functionality)",
     "background": {
-        "page": "bg.html",
-        "scripts": ["bg-requests.js"]
+        "scripts": ["bg-requests.js", "redirect.js"]
     },
-    "manifest_version": 3,
+    "manifest_version": 2,
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
         "js": ["content.js"]
@@ -29,8 +29,8 @@
     },
 
     "options_ui": {
-      "page": "options.html",
-      "chrome_style": true
+        "page": "options.html",
+        "chrome_style": true
 
     }
 
