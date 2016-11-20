@@ -4,7 +4,7 @@
     "description": "Redirects time-sink sites to a custom URL. Screw reddit!
         (+newtab functionality)",
     "background": {
-        "scripts": ["bg-requests.js", "redirect.js"]
+        "scripts": ["bg-requests.js"]
     },
     "manifest_version": 2,
     "content_scripts": [{

@@ -1,27 +1,41 @@
 //MANUAL OVERRIDE -- set to 'false' to turn redirecting off
 enabled = true;
 
-var pattern = new RegExp("reddit");
-var pattern1 = new RegExp("youtube");
-var pattern2 = new RegExp("twitter");
-var pattern3 = new RegExp("twitch");
-var pattern5 = new RegExp("facebook");
-var pattern6 = new RegExp("messages");
-var urlA = window.location;
+var url = window.location;
 
-var redir = false;
+var sites = [
+    "reddit",
+    "youtube",
+    "twitter",
+    "twitch",
+    "facebook"
+];
 
-if (pattern.test(urlA)||pattern2.test(urlA)||pattern3.test(urlA) || pattern5.test(urlA)) // if it matches pattern defined above
+var allowed = [
+    "facebook.com/messages"
+];
 
-{redir = true; }
+function match(string) {
+    var redir = false;
+    var length = sites.length;
 
-if (pattern6.test(urlA)){
-redir = false ;}
+    for (i = 0; i < length; i++) {
+        if (new RegExp(sites[i]).test(string)) {
+            redir = true;
+        }
+    }
 
+    var length = allowed.length
+    for (i = 0; i < length; i++) {
+        if (new RegExp(allowed[i]).test(string)) {
+            redir = false;
+        }
+    }
+    return redir;
+}
 
-
-
-
-if(redir && enabled){
-  chrome.extension.sendRequest({redirect: "chrome://newtab"}); // send message to redirect
+if (match(url)&& enabled) {
+    chrome.extension.sendRequest({
+        redirect: "chrome://newtab"
+    }); // send redirect message
 }
