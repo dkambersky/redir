@@ -9,7 +9,7 @@
         "scripts": ["bg-requests.js"]
     },
 
-    "permissions": ["webRequest", "webRequestBlocking", "http://*.reddit.com/*"],
+    "permissions": ["webRequest", "webRequestBlocking"],
     "optional_permissions": [
         "*://*/*"
     ],
