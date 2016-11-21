@@ -1,18 +1,18 @@
 {
+    "manifest_version": 2,
     "name": "Cabbage's Anti-Procrastinator",
     "version": "1.3.37",
-    "description": "Redirects time-sink sites to a custom URL. Screw reddit!
-        (+newtab functionality)",
+    "description": "Redirects time-sink sites to a custom URL. Screw reddit! (+newtab functionality)",
+    "icons": { "128": "icon.png" },
+
     "background": {
         "scripts": ["bg-requests.js"]
     },
-    "manifest_version": 2,
-    "content_scripts": [{
-        "matches": ["http://*/*", "https://*/*"],
-        "js": ["content.js"]
-    }],
 
-    "permissions": ["webRequest", "tabs", "*://reddit.com/*", "*://*.reddit.com/*", "webRequestBlocking"],
+    "permissions": ["webRequest", "webRequestBlocking", "http://*.reddit.com/*"],
+    "optional_permissions": [
+        "*://*/*"
+    ],
 
     "chrome_url_overrides": {
         "newtab": "redirect.html"
@@ -21,17 +21,11 @@
     "browser_action": {
         "default_icon": "icon.png",
         "default_title": "Control blocked sites"
-
-    },
-
-    "icons": {
-        "128": "icon.png"
     },
 
     "options_ui": {
         "page": "options.html",
         "chrome_style": true
-
     }
 
 }
