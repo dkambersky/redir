@@ -1,4 +1,4 @@
-//TODO settings
+//TODO settings test
 //TODO storage
 //TODO dynamic permission allocation
 
