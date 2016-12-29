@@ -5,7 +5,7 @@
 var enabled = true;
 var inited = false;
 var redirURL = "https://google.co.uk";
-var shit = 5;
+var whatever = 5;
 var waiting = 0;
 
 
@@ -81,7 +81,7 @@ function initSettings() {
         saveSetting('allowed', [
             "facebook.com/messagesxx"
         ]);
-        saveSetting('shit', '10');*/
+        saveSetting('whatever', '10');*/
 
         console.log('init settings should be done');
 
@@ -91,7 +91,7 @@ function initSettings() {
 //clearSettings();
 inited = false;
 initSettings();
-alert(shit);
+alert(whatever);
 
 
 // Reload config when stored config changes
@@ -102,7 +102,7 @@ chrome.storage.onChanged.addListener(function(changes, area) {
 });
 
 function loadSettings(f) {
-    chrome.storage.sync.get('shit', function(items) {
+    chrome.storage.sync.get('whatever', function(items) {
         if (items.inited === 'true' || f) {
           console.log('Loading. Waiting:' + waiting );
             for (key in items) {
@@ -114,8 +114,8 @@ function loadSettings(f) {
             enabled = items.enabled;
             sites = items.sites;
             allowed = items.allowed;
-            shit = 10;
-            console.log(shit + ' should be 10, stored: ' + items.shit + items.mainUrl);
+            whatever = 10;
+            console.log(whatever + ' should be 10, stored: ' + items.whatever + items.mainUrl);
 
         }
     });
