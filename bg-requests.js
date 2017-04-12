@@ -81,7 +81,8 @@ function initSettings() {
         saveSetting('allowed', [
             "facebook.com/messagesxx"
         ]);
-        saveSetting('shit', '10');*/
+        */
+        saveSetting('shit', '10');
 
         console.log('init settings should be done');
 
@@ -125,9 +126,9 @@ function loadSettings(f) {
 function saveSetting(key, value) {
     waiting++;
     console.log('Saving a value: ' + key + '. Waiting, this including: ' + waiting);
-    chrome.storage.sync.set({
-        key: value
-    }, function() {
+    var a = {};
+    a[key] = value;
+    chrome.storage.sync.set(a, function() {
         console.log('value ' + value + ' set for key ' + key);
         waiting--;
     });
@@ -141,6 +142,6 @@ function clearSettings() {
     chrome.storage.sync.clear();
 }
 
-chrome.storage.local.get(function(result) {
+chrome.storage.sync.get(function(result) {
     console.log(result)
 })
