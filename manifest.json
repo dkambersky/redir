@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "Cabbage's Anti-Procrastinator",
+    "name": "Anti-Procrastinator",
     "version": "1.3.37",
-    "description": "Redirects time-sink sites to a custom URL. Stop reddit! (+ optionally replaces newtab)",
+    "description": "Redirects time-sink websites to a custom URL. Stop reddit!\n (+ optionally replaces newtab)",
     "icons": {
         "128": "icons/on.png"
     },
