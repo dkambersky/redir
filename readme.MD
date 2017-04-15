@@ -13,5 +13,5 @@ The only permission needed is 'notifications', to display the initial notificati
 (and of course then the actual site URL permissions to intercept the WebRequests and redirect if needed.)
 
 ## TODO ##
-- let users tweak the Allowed regular expressions (e.g. disallow \*.facebook.com/\* but allow facebook.com/messages) through the Options page
-   - this can currently be done by invoking saveSetting('allowed', ['<an allowed regex>', '<another regex>' [..] ]) from the console on the Background page (in chrome://extensions -> inspect views -> background page)
+- let users tweak the Allowed regular expressions (e.g. disallow '\*.facebook.com/\*' but allow 'facebook.com/messages') through the Options page
+   - this can currently be done by invoking `saveSetting('allowed', ['<an allowed regex>', '<another regex>' [..] '<last allowed regex>'])` from the console on the Background page (in chrome://extensions -> inspect views -> background page)
