@@ -1,151 +1,170 @@
-//TODO settings test
-//TODO storage
-//TODO dynamic permission allocation
+var inited = false
+var waiting = 0
+var config
 
-var enabled = true;
-var inited = false;
-var redirURL = "https://google.co.uk";
-var whatever = 5;
-var waiting = 0;
-
-
-var sites = [
-    "reddit",
-    "youtube",
-    "twitter",
-    "twitch",
-    "facebook"
-];
-
-var allowed = [
-    "facebook.com/messages"
-];
-
-chrome.webRequest.onBeforeRequest.addListener(
-    function(details) {
-        if (match(details.url)) {
-            return {
-                redirectUrl: redirURL
-            };
-        } else return {
-            redirectURl: details.url
-        };
-
-    }, {
-        urls: [
-            // This function only gets called on URLs we have permissions for anyway
-            "*://*/*"
-        ],
-        types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
-    }, ["blocking"]);
-
+/* This used to check for blocked URLs first - not needed now, as the match()
+ *  function will only be called on blocked sites in the first place. */
 function match(string) {
-    var redir = false;
-    var length = sites.length;
 
-    for (i = 0; i < length; i++) {
-        if (new RegExp(sites[i]).test(string)) {
-            redir = true;
+    var isAllowed = false
+
+    for (i = 0; i < config.allowed.length; i++) {
+        if (new RegExp(config.allowed[i]).test(string)) {
+            isAllowed = true
         }
     }
 
-    var length = allowed.length
-    for (i = 0; i < length; i++) {
-        if (new RegExp(allowed[i]).test(string)) {
-            redir = false;
+    return !isAllowed;
+}
+
+function addSite(url, callback) {
+    console.log('Registering permissions for ' + url)
+
+    /* Stop if we have permission already */
+    chrome.permissions.contains({
+        permissions: [],
+        origins: [url]
+    }, function(result) {
+        if (result) {
+            return
         }
+    });
+
+    /* Request permission */
+    chrome.permissions.request({
+        permissions: [],
+        origins: [url]
+    }, function(granted) {
+        if (granted) {
+            /* Update records */
+            console.log('Permission granted.')
+            config.sites.push(url)
+            saveSetting('sites', config.sites)
+
+            /* Rebuild our Settings page with the callback provided */
+            callback()
+
+        } else {
+            console.log('Permission denied.')
+        }
+    });
+
+}
+
+function removeSite(i, callback) {
+    var url = config.sites[i]
+
+    chrome.permissions.remove({
+        permissions: [],
+        origins: [url]
+    }, function(removed) {
+        if (removed) {
+
+            /* Update config  */
+            config.sites.splice(config.sites.indexOf(url), 1)
+            saveSetting('sites', config.sites)
+            loadSettings()
+
+            /* Rebuild Settings page */
+            callback()
+        } else {
+            console.log('The permission for ' + url + ' could not be removed.')
+        }
+    });
+
+}
+
+function updateIcon() {
+    /* Update icon */
+    if (config.redirEnabled) {
+        chrome.browserAction.setIcon({path: 'icons/on.png'})
+    } else {
+        chrome.browserAction.setIcon({path: 'icons/off.png'})
     }
 
-    return redir;
 }
 
 
-// / Config helper functions
+/* Config handling functions */
+function initValues() {
+    saveSetting('mainUrl', 'chrome://extensions/?options=' + chrome.runtime.id);
+    saveSetting('inited', true);
+    saveSetting('redirEnabled', true);
+    saveSetting('newtabEnabled', true)
+    saveSetting('sites', []);
+    saveSetting('allowed', ["facebook.com/messages"]);
 
-// Initial setup
-function initSettings() {
-    loadSettings(1);
-
-    if (!inited) {
-        saveSetting('mainUrl', 'https://dkambersky.io/v2');
-      saveSetting('inited', 'true');
-        saveSetting('enabled', 'true');
-/*        saveSetting('sites', [
-            "reddit",
-            "youtube",
-            "twitter",
-            "twitch",
-            "facebook"
-        ]);
-
-        saveSetting('allowed', [
-            "facebook.com/messagesxx"
-        ]);
-
-        */
-
-
-        saveSetting('whatever', '10');
-
-
-        console.log('init settings should be done');
-
-        loadSettings(true);
-    }
+    console.log('Initial settings stored');
+    loadSettings();
 }
-//clearSettings();
-inited = false;
-initSettings();
-alert(whatever);
+
+function loadSettings(callback) {
+    chrome.storage.sync.get(function(items) {
+        if (items.inited) {
+            config = items
+        } else {
+            initValues()
+        }
+        if (typeof callback !== 'undefined') {
+            callback()
+        }
+
+    });
+}
+
+function saveSetting(key, value, callback) {
+    waiting++;
+    var a = {};
+    a[key] = value;
+    chrome.storage.sync.set(a, function() {
+        waiting--;
+        /* If provided a callback, execute it */
+        loadSettings(callback)
+
+    });
+    if (chrome.runtime.lastError != null) {
+        alert(chrome.runtime.lastError.message + ': error while saving setting ' + key);
+    }
+
+}
+
+function clearSettings() {
+    console.log('Clearing settings');
+    chrome.storage.sync.clear();
+}
 
 
-// Reload config when stored config changes
+/* Register listeners */
+
+/* Reload config when stored config changes */
 chrome.storage.onChanged.addListener(function(changes, area) {
     if (area === "sync") {
         loadSettings();
     }
 });
 
-function loadSettings(f) {
-    chrome.storage.sync.get('whatever', function(items) {
-        if (items.inited === 'true' || f) {
-          console.log('Loading. Waiting:' + waiting );
-            for (key in items) {
-                console.log('for: ' + key + '  |  ' + items[key]);
-            }
-
-            inited = true;
-            redirURL = items.mainUrl;
-            enabled = items.enabled;
-            sites = items.sites;
-            allowed = items.allowed;
-            whatever = 10;
-            console.log(whatever + ' should be 10, stored: ' + items.whatever + items.mainUrl);
-
-        }
-    });
-}
-
-
-function saveSetting(key, value) {
-    waiting++;
-    console.log('Saving a value: ' + key + '. Waiting, this including: ' + waiting);
-    var a = {};
-    a[key] = value;
-    chrome.storage.sync.set(a, function() {
-        console.log('value ' + value + ' set for key ' + key);
-        waiting--;
-    });
-    if (chrome.runtime.lastError != null) {
-        alert(chrome.runtime.lastError.message + ': error');
-    }
-}
-
-function clearSettings() {
-  console.log('clearingSettings');
-    chrome.storage.sync.clear();
-}
-
-chrome.storage.sync.get(function(result) {
-    console.log(result)
+/* Toggle redirecting on icon clicked */
+chrome.browserAction.onClicked.addListener(function(tab) {
+    /* Toggle */
+    saveSetting('redirEnabled', !config.redirEnabled, updateIcon)
 })
+
+/* Main WebRequest listener */
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+
+    if (!config.redirEnabled) {
+        return
+    }
+
+    if (match(details.url)) {
+        return {redirectUrl: config.mainUrl};
+    } else
+        return {redirectUrl: details.url};
+}, {
+    /* This listener only gets called on URLs we have permissions for anyway */
+    urls: ["*://*/*"],
+    types: ["main_frame"]
+}, ["blocking"]);
+
+/* On-load, load settings */
+loadSettings(updateIcon)

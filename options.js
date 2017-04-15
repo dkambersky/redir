@@ -1,32 +1,82 @@
-// Saves options to chrome.storage.sync.
-function save_options() {
-  var color = document.getElementById('color').value;
-  var likesColor = document.getElementById('like').checked;
-  chrome.storage.sync.set({
-    favoriteColor: color,
-    likesColor: likesColor
-  }, function() {
-    // Update status to let user know options were saved.
-    var status = document.getElementById('status');
-    status.textContent = 'Options saved.';
-    setTimeout(function() {
-      status.textContent = '';
-    }, 750);
-  });
+/* On-load */
+var bg = chrome.extension.getBackgroundPage()
+buildTable()
+loadOptions()
+hookOptionsListeners()
+
+/* Functions */
+function buildTable() {
+    var sites = bg.config.sites
+    var html = '<table id = "sitesTable" class = "sites"><tbody>';
+
+    for (var i = 0, len = sites.length; i < len; ++i) {
+        var site = sites[i]
+        var prettyName = site.substring(site.indexOf('://') + 5, site.lastIndexOf('/'))
+        html += '<tr><td><button type = "button" id = "siteButton' + i + '">-</button></td> <td>' + prettyName + "</td></tr>";
+    }
+    html += '<tr><td><button type = "button" id = "addButton">+</button></td> <td> <input type = "text" id = "newSite"> </td></tr>';
+
+    document.getElementById('sitesTable').innerHTML = html
+    document.getElementById('addButton').addEventListener('click', function(event) {
+        bg.addSite(makeOrigin($("#newSite").val()), buildTable)
+    })
+
+    $("#sitesTable").delegate("button", "click", function() {
+        if (!(this.id === 'addButton')) {
+            bg.removeSite(this.id[this.id.length - 1], buildTable)
+        }
+    })
+
+    $('#newSite').on('keyup', function(e) {
+        if (e.keyCode == 13) {
+            bg.addSite(makeOrigin($("#newSite").val()), buildTable)
+        }
+    });
+
 }
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
-function restore_options() {
-  // Use default value color = 'red' and likesColor = true.
-  chrome.storage.sync.get({
-    favoriteColor: 'red',
-    likesColor: true
-  }, function(items) {
-    document.getElementById('color').value = items.favoriteColor;
-    document.getElementById('like').checked = items.likesColor;
-  });
+function loadOptions() {
+    $('#redirCheck').prop('checked', bg.config.redirEnabled)
+    $('#newtabCheck').prop('checked', bg.config.newtabEnabled)
+    var defaultStr = 'chrome://extensions/?options=' + chrome.runtime.id
+    if (defaultStr !== bg.config.mainUrl) {
+        $('#redirUrlBox').val(bg.config.mainUrl)
+    }
 }
-document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click',
-    save_options);
+
+function hookOptionsListeners() {
+    $('#urlSubmitButton').click(function() {
+        var url = $('#redirUrlBox').val()
+        alert(url)
+
+        /* Prepend protocol if needed */
+        if (!/^https?:\/\//i.test(url)) {
+            url = 'http://' + url;
+        }
+
+        bg.saveSetting('mainUrl', url, loadOptions)
+
+    })
+
+    $('#redirCheck').change(function() {
+        alert('redir ' + this.checked)
+        bg.saveSetting('redirEnabled', this.checked, loadOptions)
+    })
+    $('#newtabCheck').change(function() {
+        alert('newtab  ' + this.checked)
+        bg.saveSetting('newtabEnabled', this.checked, loadOptions)
+    })
+}
+
+/* Append stuff to make a properly formatted all-encompassing Origin
+ * This expects the 'secondlevel.toplevel' format domain, e.g. 'facebook.com'
+ * TODO make this work better with all valid inputs
+ */
+function makeOrigin(input) {
+
+    if (!/^https?:\/\//i.test(input)) {
+        return '*://*.' + input + '/*'
+    }
+
+    return input + '/*'
+}

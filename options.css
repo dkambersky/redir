@@ -1,0 +1,16 @@
+.sites tr td {
+    border-bottom: 1px solid #ddd
+}
+
+.linebreak {
+    border-top: 1.5px solid #ddd;
+    margin-bottom: 5px
+}
+.subheader {
+  font-style: italic;
+  color: #aaa
+}
+
+body {
+    padding: 10px;
+}

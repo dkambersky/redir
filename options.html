@@ -1,25 +1,58 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Options</title>
-  <style>
-    body: { padding: 10px; }
-  </style>
+    <script src="jquery.js"></script>
+    <link rel="stylesheet" href="options.css" />
+    <title>Options</title>
 </head>
 
 <body>
-  <b>Blocked sites:</b>
-<br />
+    <center>
+        <font size="4">Settings</font>
+        <br />
+        <br />
+        <table>
+            <tr>
+                <td>
+                    <input id="redirCheck" type="checkbox" />
+                    <label for="redirCheck">Enable redirection from blocked websites</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input id="newtabCheck" type="checkbox" />
+                    <label for="newtabCheck">Enable redirection from Chrome's New Tab page</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <center>
+                        <br />Redirection URL:<br /><input type="text" id="redirUrlBox" style="margin-top: 5px; width: 80%;">
+                        <button type="button" id="urlSubmitButton">set</button>
+                    </center>
 
+                </td>
+            </tr>
+        </table>
+        <br />
+        <br />
+        <div class="linebreak"></div>
+        <font size="4">Blocked sites</font>
 
-  <label>
-    <input type="checkbox" id="like">
-    I like colors.
-  </label>
+        <br />
+        <div class="subheader">
+            Enter in the format 'reddit.com'
+        </div>
+        <br />
+        <table id="sitesTable" class="sites"></table>
+        <br />
+        <br />
 
-  <div id="status"></div>
-  <button id="save">Save</button>
+        <div id="status"></div>
+    </center>
 
-  <script src="options.js"></script>
+    <script src="options.js"></script>
 </body>
+
 </html>
