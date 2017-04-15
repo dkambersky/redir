@@ -17,8 +17,8 @@ function buildTable() {
     }
     html += '<tr><td><button type = "button" id = "addButton">+</button></td> <td> <input type = "text" id = "newSite"> </td></tr>';
 
-    document.getElementById('sitesTable').innerHTML = html
-    document.getElementById('addButton').addEventListener('click', function(event) {
+    $('#sitesTable').html(html)
+    $('#addButton').click(function(event) {
         bg.addSite(makeOrigin($("#newSite").val()), rebuild)
     })
 
@@ -54,32 +54,31 @@ function hookOptionsListeners() {
             url = 'http://' + url;
         }
 
-        bg.saveSetting('mainUrl', url, loadOptions)
+        bg.saveSetting('mainUrl', url, rebuildOptions)
 
     })
 
     $('#redirUrlBox').on('keyup', function(e) {
         if (e.keyCode == 13) {
-          var url = $('#redirUrlBox').val()
+            var url = $('#redirUrlBox').val()
 
-          /* Prepend protocol if needed */
-          if (!/^https?:\/\//i.test(url)) {
-              url = 'http://' + url;
-          }
+            /* Prepend protocol if needed */
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'http://' + url;
+            }
 
-          bg.saveSetting('mainUrl', url, loadOptions)
+            bg.saveSetting('mainUrl', url, rebuildOptions)
 
         }
     });
 
     $('#redirCheck').change(function() {
-        bg.saveSetting('redirEnabled', this.checked, loadOptions)
+        bg.saveSetting('redirEnabled', this.checked, rebuildOptions)
     })
     $('#newtabCheck').change(function() {
 
-        bg.saveSetting('newtabEnabled', this.checked, loadOptions)
+        bg.saveSetting('newtabEnabled', this.checked, rebuildOptions)
     })
-
 
 }
 
@@ -96,16 +95,21 @@ function makeOrigin(input) {
     return input + '/*'
 }
 
-
-function refocus(){
-  if($('#redirUrlBox').val() === ''){
-    $('#redirUrlBox').focus()
-  } else {
-    $('#newSite').focus()
-  }
+function refocus() {
+    if ($('#redirUrlBox').val() === '') {
+        $('#redirUrlBox').focus()
+    } else {
+        $('#newSite').focus()
+    }
 }
 
-function rebuild(){
-  buildTable()
-  refocus()
+function rebuild() {
+    buildTable()
+    refocus()
+}
+
+/* These are kept distinct so we don't reubild the table on e.g. a checkbox being checked */
+function rebuildOptions(){
+loadOptions()
+refocus()
 }

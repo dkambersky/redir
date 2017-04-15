@@ -5,7 +5,7 @@ var config
 /* This used to check for blocked URLs first - not needed now, as the match()
  *  function will only be called on blocked sites in the first place. */
 function match(string) {
-    
+
     var isAllowed = false
 
     for (i = 0; i < config.allowed.length; i++) {
@@ -95,7 +95,8 @@ function initValues(callback) {
     saveSetting('redirEnabled', true)
     saveSetting('newtabEnabled', false)
     saveSetting('sites', []);
-    saveSetting('allowed', ["facebook.com/messages"])
+    // TODO implement Allowed tweaking through the Options page
+    saveSetting('allowed', [])
     saveSetting('notifSent', false)
 
     console.log('Initial settings stored')
@@ -105,6 +106,7 @@ function initValues(callback) {
 
 function loadSettings(callback) {
     chrome.storage.sync.get(function(items) {
+
         if (items.inited) {
             config = items
             if (typeof callback !== 'undefined') {
@@ -143,6 +145,7 @@ function clearSettings() {
 function init() {
     updateIcon()
     if (!config.notifSent) {
+      // TODO  rethink if we need this - permissions (but it's so nice :( ))
         saveSetting('notifSent', true)
         chrome.notifications.create('initNotif', {
             type: 'basic',
