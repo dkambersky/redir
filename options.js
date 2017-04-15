@@ -3,6 +3,7 @@ var bg = chrome.extension.getBackgroundPage()
 buildTable()
 loadOptions()
 hookOptionsListeners()
+refocus()
 
 /* Functions */
 function buildTable() {
@@ -18,18 +19,18 @@ function buildTable() {
 
     document.getElementById('sitesTable').innerHTML = html
     document.getElementById('addButton').addEventListener('click', function(event) {
-        bg.addSite(makeOrigin($("#newSite").val()), buildTable)
+        bg.addSite(makeOrigin($("#newSite").val()), rebuild)
     })
 
     $("#sitesTable").delegate("button", "click", function() {
         if (!(this.id === 'addButton')) {
-            bg.removeSite(this.id[this.id.length - 1], buildTable)
+            bg.removeSite(this.id[this.id.length - 1], rebuild)
         }
     })
 
     $('#newSite').on('keyup', function(e) {
         if (e.keyCode == 13) {
-            bg.addSite(makeOrigin($("#newSite").val()), buildTable)
+            bg.addSite(makeOrigin($("#newSite").val()), rebuild)
         }
     });
 
@@ -47,7 +48,6 @@ function loadOptions() {
 function hookOptionsListeners() {
     $('#urlSubmitButton').click(function() {
         var url = $('#redirUrlBox').val()
-        alert(url)
 
         /* Prepend protocol if needed */
         if (!/^https?:\/\//i.test(url)) {
@@ -58,14 +58,29 @@ function hookOptionsListeners() {
 
     })
 
+    $('#redirUrlBox').on('keyup', function(e) {
+        if (e.keyCode == 13) {
+          var url = $('#redirUrlBox').val()
+
+          /* Prepend protocol if needed */
+          if (!/^https?:\/\//i.test(url)) {
+              url = 'http://' + url;
+          }
+
+          bg.saveSetting('mainUrl', url, loadOptions)
+
+        }
+    });
+
     $('#redirCheck').change(function() {
-        alert('redir ' + this.checked)
         bg.saveSetting('redirEnabled', this.checked, loadOptions)
     })
     $('#newtabCheck').change(function() {
-        alert('newtab  ' + this.checked)
+
         bg.saveSetting('newtabEnabled', this.checked, loadOptions)
     })
+
+
 }
 
 /* Append stuff to make a properly formatted all-encompassing Origin
@@ -79,4 +94,18 @@ function makeOrigin(input) {
     }
 
     return input + '/*'
+}
+
+
+function refocus(){
+  if($('#redirUrlBox').val() === ''){
+    $('#redirUrlBox').focus()
+  } else {
+    $('#newSite').focus()
+  }
+}
+
+function rebuild(){
+  buildTable()
+  refocus()
 }

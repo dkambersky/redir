@@ -5,7 +5,7 @@ var config
 /* This used to check for blocked URLs first - not needed now, as the match()
  *  function will only be called on blocked sites in the first place. */
 function match(string) {
-
+    
     var isAllowed = false
 
     for (i = 0; i < config.allowed.length; i++) {
@@ -41,6 +41,10 @@ function addSite(url, callback) {
             config.sites.push(url)
             saveSetting('sites', config.sites)
 
+            /* Register the listener if it previously didn't have anything to attach to */
+            if(config.sites.length == 1){
+              registerWebrequestListener()
+            }
             /* Rebuild our Settings page with the callback provided */
             callback()
 
@@ -84,29 +88,31 @@ function updateIcon() {
 
 }
 
-
 /* Config handling functions */
-function initValues() {
-    saveSetting('mainUrl', 'chrome://extensions/?options=' + chrome.runtime.id);
-    saveSetting('inited', true);
-    saveSetting('redirEnabled', true);
-    saveSetting('newtabEnabled', true)
+function initValues(callback) {
+    saveSetting('mainUrl', 'chrome://extensions/?options=' + chrome.runtime.id)
+    saveSetting('inited', true)
+    saveSetting('redirEnabled', true)
+    saveSetting('newtabEnabled', false)
     saveSetting('sites', []);
-    saveSetting('allowed', ["facebook.com/messages"]);
+    saveSetting('allowed', ["facebook.com/messages"])
+    saveSetting('notifSent', false)
 
-    console.log('Initial settings stored');
-    loadSettings();
+    console.log('Initial settings stored')
+    loadSettings(callback)
+
 }
 
 function loadSettings(callback) {
     chrome.storage.sync.get(function(items) {
         if (items.inited) {
             config = items
+            if (typeof callback !== 'undefined') {
+                callback()
+            }
+
         } else {
-            initValues()
-        }
-        if (typeof callback !== 'undefined') {
-            callback()
+            initValues(callback)
         }
 
     });
@@ -133,6 +139,31 @@ function clearSettings() {
     chrome.storage.sync.clear();
 }
 
+/* Initial callback */
+function init() {
+    updateIcon()
+    if (!config.notifSent) {
+        saveSetting('notifSent', true)
+        chrome.notifications.create('initNotif', {
+            type: 'basic',
+            iconUrl: 'icons/on.png',
+            title: 'Set up Anti-Procrastinator!',
+            message: 'You haven\'t set any sites to block or an URL to redirect to.\nClick here to open settings and set them up.\n(This is a one-time message.)'
+        }, function(notificationId) {})
+
+        chrome.notifications.onClicked.addListener(function() {
+            chrome.runtime.openOptionsPage()
+            chrome.notifications.clear('initNotif')
+        })
+
+        setTimeout(function() {
+            chrome.notifications.clear('initNotif')
+        }, 10000)
+
+    }
+
+    registerWebrequestListener()
+}
 
 /* Register listeners */
 
@@ -149,22 +180,23 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     saveSetting('redirEnabled', !config.redirEnabled, updateIcon)
 })
 
-/* Main WebRequest listener */
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
+function registerWebrequestListener() {/* Main WebRequest listener */
+    chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
-    if (!config.redirEnabled) {
-        return
-    }
+        if (!config.redirEnabled) {
+            return
+        }
 
-    if (match(details.url)) {
-        return {redirectUrl: config.mainUrl};
-    } else
-        return {redirectUrl: details.url};
-}, {
-    /* This listener only gets called on URLs we have permissions for anyway */
-    urls: ["*://*/*"],
-    types: ["main_frame"]
-}, ["blocking"]);
+        if (match(details.url)) {
+            return {redirectUrl: config.mainUrl};
+        } else
+            return {redirectUrl: details.url};
+    }, {
+        /* This listener only gets called on URLs we have permissions for anyway */
+        urls: ["*://*/*"],
+        types: ["main_frame"]
+    }, ["blocking"]);
+}
 
 /* On-load, load settings */
-loadSettings(updateIcon)
+loadSettings(init)

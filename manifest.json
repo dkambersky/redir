@@ -11,7 +11,7 @@
         "scripts": ["jquery.js", "bg-requests.js"]
     },
 
-    "permissions": ["webRequest", "webRequestBlocking", "storage"],
+    "permissions": ["webRequest", "webRequestBlocking", "storage", "notifications"],
     "optional_permissions": [
         "*://*/*"
     ],
