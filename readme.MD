@@ -1,4 +1,4 @@
-Cabbage's Anti-Procrastinator
+Anti-Procrastinator
 =====
 (for lack of a better name)
 
@@ -15,3 +15,5 @@ The only permission needed is 'notifications', to display the initial notificati
 ## TODO ##
 - let users tweak the Allowed regular expressions (e.g. disallow '\*.facebook.com/\*' but allow 'facebook.com/messages') through the Options page
    - this can currently be done by invoking `saveSetting('allowed', ['<an allowed regex>', '<another regex>' [..] '<last allowed regex>'])` from the console on the Background page (in chrome://extensions -> inspect views -> background page)
+
+- Make sync'd settings behave properly - at the moment, the extension loads and syncs settings properly, but fails to ask for permissions on a new install for pre-existing blocked websites.
